@@ -1,0 +1,42 @@
+{
+  "name": "hexo-shortid",
+  "version": "1.0.0",
+  "description": "Use dylang/shortid to generate abbreviated post links.",
+  "main": "index.js",
+  "scripts": {
+    "test": "ava test/**/*.test.js"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/cowsay-blog/hexo-shortid.git"
+  },
+  "keywords": [
+    "hexo",
+    "post",
+    "link",
+    "shortid"
+  ],
+  "author": "MomoCow",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/cowsay-blog/hexo-shortid/issues"
+  },
+  "homepage": "https://github.com/cowsay-blog/hexo-shortid#readme",
+  "dependencies": {
+    "hexo-front-matter": "^0.2.3",
+    "shortid": "^2.2.14"
+  },
+  "devDependencies": {
+    "ava": "^1.1.0",
+    "eslint": "^5.12.1",
+    "eslint-config-standard": "^12.0.0",
+    "eslint-plugin-import": "^2.15.0",
+    "eslint-plugin-node": "^8.0.1",
+    "eslint-plugin-promise": "^4.0.1",
+    "eslint-plugin-standard": "^4.0.0",
+    "fs-extra": "^7.0.1",
+    "hexo": "^3.8.0",
+    "sinon": "^7.2.3",
+    "stream-equal": "^1.1.1"
+  }
+}
