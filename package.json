@@ -4,6 +4,7 @@
   "description": "Use dylang/shortid to generate abbreviated post links.",
   "main": "index.js",
   "scripts": {
+    "commit": "gitmoji -c",
     "test": "ava test/**/*.test.js"
   },
   "repository": {
@@ -35,6 +36,7 @@
     "eslint-plugin-promise": "^4.0.1",
     "eslint-plugin-standard": "^4.0.0",
     "fs-extra": "^7.0.1",
+    "gitmoji-cli": "^1.9.2",
     "hexo": "^3.8.0",
     "sinon": "^7.2.3",
     "stream-equal": "^1.1.1"
