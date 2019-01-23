@@ -1,9 +1,9 @@
 # hexo-shortid
 Use [dylang/shortid](https://github.com/dylang/shortid) to generate abbreviated post links.
 
-In addition to ID generation, the plugin also ensures the uniqueness of post IDs.
+In addition to ID generation, the plugin also validates and ensures the uniqueness of post IDs among your posts.
 
-## COnfiguration
+## Configuration
 ```ts
 interface HexoShortIdOptions {
   /**
