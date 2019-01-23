@@ -13,7 +13,7 @@ const INSTANCE_DIR = path.join(FIXTURE_DIR, 'instance')
 const POST_DIR = path.join(INSTANCE_DIR, 'source', '_posts')
 const TEST_SRC_FILE = path.join(FIXTURE_DIR, 'test.md')
 const TEST_TARGET_FILE = path.join(POST_DIR, 'test.md')
-const EXPECT_FILE = path.join(FIXTURE_DIR, 'expect.md')
+const EXPECT_FILE = path.join(FIXTURE_DIR, 'expect.html')
 
 test.before('init instance', async function initInstance (t) {
   await fs.ensureDir(POST_DIR)
@@ -45,7 +45,11 @@ test.afterEach('reset', function (t) {
 })
 
 test('use short id as route', async function (t) {
+  t.plan(2)
+
   await t.context.hexo.load()
+
+  t.true(shortid.generate.calledOnce)
 
   const postId = shortid.generate.firstCall.returnValue
   const postStream = t.context.hexo.route.get(`/${postId}`)
