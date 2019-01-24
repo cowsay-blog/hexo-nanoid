@@ -12,7 +12,7 @@ interface HexoShortIdOptions {
   autofix: boolean
 
   /**
-   * @default Infinity
+   * @default 10
    */
   maxtry: number | "Infinity"
 }

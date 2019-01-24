@@ -25,6 +25,7 @@
   "homepage": "https://github.com/cowsay-blog/hexo-shortid#readme",
   "dependencies": {
     "hexo-front-matter": "^0.2.3",
+    "lodash.get": "^4.4.2",
     "shortid": "^2.2.14"
   },
   "devDependencies": {
@@ -38,6 +39,7 @@
     "fs-extra": "^7.0.1",
     "gitmoji-cli": "^1.9.2",
     "hexo": "^3.8.0",
+    "hexo-cli": "^1.1.0",
     "sinon": "^7.2.3",
     "stream-equal": "^1.1.1"
   }
