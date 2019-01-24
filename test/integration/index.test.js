@@ -1,59 +1,47 @@
-const Hexo = require('hexo')
 const test = require('ava')
 const fs = require('fs-extra')
 const path = require('path')
-const { spy } = require('sinon')
-const shortid = require('shortid')
 const streamEqual = require('stream-equal')
-const { promisify } = require('util')
-const exec = promisify(require('child_process').exec)
+
+const HexoInstance = require('../utils//HexoInstance')
 
 const FIXTURE_DIR = path.join(__dirname, '..', 'fixtures')
-const INSTANCE_DIR = path.join(FIXTURE_DIR, 'instance')
-const POST_DIR = path.join(INSTANCE_DIR, 'source', '_posts')
-const TEST_SRC_FILE = path.join(FIXTURE_DIR, 'test.md')
-const TEST_TARGET_FILE = path.join(POST_DIR, 'test.md')
-const EXPECT_FILE = path.join(FIXTURE_DIR, 'expect.html')
 
-test.before('init instance', async function initInstance (t) {
-  await fs.ensureDir(POST_DIR)
-  await fs.emptyDir(POST_DIR)
-
-  if (!fs.existsSync(path.join(INSTANCE_DIR, 'node_modules'))) {
-    // install deps
-    t.log('Installing dependencies...')
-    await exec('npm install')
-  }
-  t.log('Instance initialized.')
+test.before('Init tmp', function () {
+  return HexoInstance.init()
 })
 
-test.beforeEach('init case', async function initCase (t) {
-  await fs.copy(TEST_SRC_FILE, TEST_TARGET_FILE, {
-    overwrite: true
-  })
-
-  spy(shortid, 'generate')
-
-  t.context.hexo = new Hexo(INSTANCE_DIR, {
-    silent: true
-  })
-  await t.context.hexo.init()
+test.after('Reset tmp', function () {
+  return HexoInstance.destroy()
 })
 
-test.afterEach('reset', function (t) {
-  shortid.generate.restore()
+test.beforeEach('Init hexo instance', async function (t) {
+  const instance = HexoInstance.create()
+  await instance.init()
+  t.context.instance = instance
 })
 
 test('use short id as route', async function (t) {
   t.plan(2)
 
-  await t.context.hexo.load()
+  /**
+   * @type {HexoInstance}
+   */
+  const instance = t.context.instance
+  let postId
+  instance.on('shortid:generate', function (_postId) {
+    postId = _postId
+  })
 
-  t.true(shortid.generate.calledOnce)
+  await instance.createPost()
+  await instance.load()
 
-  const postId = shortid.generate.firstCall.returnValue
-  const postStream = t.context.hexo.route.get(`/${postId}`)
-  const expectStream = fs.createReadStream(EXPECT_FILE)
+  t.is(typeof postId, 'string')
+
+  console.log(instance.route)
+
+  const postStream = instance.route.get(`/${postId}`)
+  const expectStream = fs.createReadStream(path.join(FIXTURE_DIR, 'expect.html'))
 
   t.true(await streamEqual(postStream, expectStream))
 })
