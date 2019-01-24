@@ -1,1 +1,3 @@
-hexo.extend.filter.register('before_post_render', require('./lib/main'), 15)
+const createValidator = require('./lib/validate')
+
+hexo.extend.filter.register('before_generate', createValidator(hexo))
