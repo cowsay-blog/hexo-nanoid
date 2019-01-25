@@ -1,6 +1,7 @@
 const test = require('ava')
 const fs = require('fs-extra')
 const path = require('path')
+const { spy } = require('sinon')
 const streamEqual = require('stream-equal')
 
 const HexoInstance = require('../utils//HexoInstance')
@@ -84,4 +85,47 @@ test('invalid short id', async function (t) {
     t.is(e.name, 'ValidationError')
     t.is(e.result.invalid.length, 1)
   }
+})
+
+test('autofixable', async function (t) {
+  t.plan(6)
+
+  /**
+   * @type {HexoInstance}
+   */
+  const instance = t.context.instance
+  instance.configure({
+    autofix: true
+  })
+
+  const shortid = 'WedsgysW-'
+  await instance.createPost({
+    shortid: 'i have spaces'
+  })
+  await Promise.all([
+    instance.createPost({ shortid }),
+    instance.createPost({ shortid })
+  ])
+
+  const generationSpy = spy()
+  instance.on('shortid:generate', generationSpy)
+
+  await instance.load()
+
+  // one of 2 conflicted posts will keep the short ID
+  // only one of them will re-generate a short ID
+  t.true(generationSpy.calledTwice)
+
+  const postIds = generationSpy.getCalls().map(call => call.args[0])
+  postIds.forEach(postId => t.is(typeof postId, 'string'))
+
+  await Promise.all(
+    postIds
+      .concat([ shortid ])
+      .map(postId => instance.route.get(`${postId}/`))
+      .map(async postStream => {
+        const expectStream = fs.createReadStream(path.join(FIXTURE_DIR, 'expect.html'))
+        t.true(await streamEqual(postStream, expectStream))
+      })
+  )
 })

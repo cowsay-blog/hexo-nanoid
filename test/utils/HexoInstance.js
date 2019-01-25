@@ -69,6 +69,12 @@ class HexoInstance extends EventEmitter {
     return targetFile
   }
 
+  configure (obj) {
+    Object.assign(this.hexo.config, {
+      shortid: obj
+    })
+  }
+
   async load () {
     await this.hexo.load()
   }
