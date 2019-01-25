@@ -10,7 +10,7 @@ Use [ai/nanoid](https://github.com/ai/nanoid) to generate abbreviated post links
 ## Features
 - Compatible with `hexo new` to generate ID for new posts.
 - ID validatation on existing posts to ensure the uniqueness.
-- Autofixable post IDs.
+- Ability to autofix invalid and conflicted post IDs.
 - Event `nanoid:generate` is emitted after each ID generation.
 
 ## Configuration
