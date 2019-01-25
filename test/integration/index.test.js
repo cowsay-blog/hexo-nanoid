@@ -2,6 +2,7 @@ const test = require('ava')
 const fs = require('fs-extra')
 const path = require('path')
 const { spy } = require('sinon')
+const genNanoId = require('nanoid')
 const streamEqual = require('stream-equal')
 
 const HexoInstance = require('../utils//HexoInstance')
@@ -30,7 +31,7 @@ test('use short id as route', async function (t) {
    */
   const instance = t.context.instance
   let postId
-  instance.on('shortid:generate', function (_postId) {
+  instance.on('nanoid:generate', function (_postId) {
     postId = _postId
   })
 
@@ -52,10 +53,10 @@ test('short id conflict', async function (t) {
    * @type {HexoInstance}
    */
   const instance = t.context.instance
-  const shortid = 'WedsgysW-'
+  const nanoid = genNanoId()
   await Promise.all([
-    instance.createPost({ shortid }),
-    instance.createPost({ shortid })
+    instance.createPost({ nanoid }),
+    instance.createPost({ nanoid })
   ])
 
   try {
@@ -63,8 +64,8 @@ test('short id conflict', async function (t) {
   } catch (e) {
     t.is(e.name, 'ValidationError')
     t.is(e.result.conflict.size, 1)
-    t.true(e.result.valid.has(shortid))
-    t.is(e.result.conflict.get(shortid).length, 1)
+    t.true(e.result.valid.has(nanoid))
+    t.is(e.result.conflict.get(nanoid).length, 1)
   }
 })
 
@@ -76,7 +77,7 @@ test('invalid short id', async function (t) {
    */
   const instance = t.context.instance
   await instance.createPost({
-    shortid: 'i have spaces'
+    nanoid: 'i have spaces'
   })
 
   try {
@@ -98,17 +99,17 @@ test('autofixable', async function (t) {
     autofix: true
   })
 
-  const shortid = 'WedsgysW-'
+  const nanoid = genNanoId()
   await instance.createPost({
-    shortid: 'i have spaces'
+    nanoid: 'i have spaces'
   })
   await Promise.all([
-    instance.createPost({ shortid }),
-    instance.createPost({ shortid })
+    instance.createPost({ nanoid }),
+    instance.createPost({ nanoid })
   ])
 
   const generationSpy = spy()
-  instance.on('shortid:generate', generationSpy)
+  instance.on('nanoid:generate', generationSpy)
 
   await instance.load()
 
@@ -121,7 +122,7 @@ test('autofixable', async function (t) {
 
   await Promise.all(
     postIds
-      .concat([ shortid ])
+      .concat([ nanoid ])
       .map(postId => instance.route.get(`${postId}/`))
       .map(async postStream => {
         const expectStream = fs.createReadStream(path.join(FIXTURE_DIR, 'expect.html'))

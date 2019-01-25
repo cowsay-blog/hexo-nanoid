@@ -1,11 +1,10 @@
 const { promisify } = require('util')
-const shortid = require('shortid')
 
 const writeFileAsync = promisify(require('fs').writeFile)
 
-const validate = require('./lib/validate')
 const getConfig = require('./lib/config')
-const generate = require('./lib/generate')
+const _validate = require('./lib/validate')
+const _generate = require('./lib/generate')
 
 const { ValidationError, GenerationError } = require('./lib/errors')
 
@@ -14,20 +13,12 @@ const {
   updateDatabase
 } = require('./lib/update')
 
+const idPool = new Set()
+
 hexo.extend.filter.register('before_generate', function () {
   const config = getConfig(this)
-
-  if (typeof config.characters === 'string' && config.characters.length === 64) {
-    shortid.characters(config.characters)
-  }
-
-  if (typeof config.seed === 'number') {
-    shortid.seed(config.seed)
-  }
-
-  if (typeof config.worker === 'number') {
-    shortid.worker(config.worker)
-  }
+  const validate = _validate.bind(this, config)
+  const generate = _generate.bind(this, config)
 
   /* Validation */
   const result = validate(this.model('Post').toArray())
@@ -36,7 +27,8 @@ hexo.extend.filter.register('before_generate', function () {
     return Promise.reject(new ValidationError(result))
   }
 
-  const idPool = new Set(Array.from(result.valid.keys()))
+  Array.from(result.valid.keys())
+    .forEach(postId => idPool.add(postId))
 
   return Promise.all(
     []
@@ -44,17 +36,19 @@ hexo.extend.filter.register('before_generate', function () {
       .concat(...Array.from(result.conflict.values()))
       .concat(result.invalid)
       .map(
-        post => generate(
-          (postId) => {
-            if (!idPool.has(postId)) {
-              idPool.add(postId)
-              return true
-            }
-            return false
-          },
-          config.maxtry
-        ).then((postId) => {
-          post.shortid = postId
+        post => {
+          const postId = generate(
+            (_postId) => {
+              if (!idPool.has(_postId)) {
+                idPool.add(_postId)
+                return true
+              }
+              return false
+            },
+            config.maxtry
+          )
+
+          post.nanoid = postId
           return Promise.resolve(updateFrontMatter(post))
             .then(() => Promise.all([
               updateDatabase(this, post),
@@ -62,11 +56,40 @@ hexo.extend.filter.register('before_generate', function () {
             ]))
             .then(() => {
               // emit generate event on this
-              this.emit('shortid:generate', postId)
+              this.emit('nanoid:generate', postId)
             })
-        }).catch(err => {
-          throw new GenerationError(post, err)
-        })
+            .catch(err => {
+              throw new GenerationError(post, err)
+            })
+        }
       )
   )
 })
+
+async function _hookedNewConsole (args) {
+  const config = getConfig(this)
+  const generate = _generate.bind(this, config)
+
+  // load files and perform ID validation
+  if (config.check_on_new) {
+    await this.load()
+  }
+  args.nanoid = generate(
+    (postId) => {
+      if (!config.check_on_new) return true
+
+      if (!idPool.has(postId)) {
+        idPool.add(postId)
+        return true
+      }
+      return false
+    },
+    config.maxtry
+  )
+  return _newConsole.call(this, args)
+}
+
+const _newConsole = hexo.extend.console.get('new')
+
+// hook into Console "new"
+hexo.extend.console.register('new', _newConsole.desc, _newConsole.options, _hookedNewConsole)

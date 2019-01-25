@@ -2,7 +2,7 @@ const Hexo = require('hexo')
 const hexocli = require('hexo-cli')
 const fs = require('fs-extra')
 const path = require('path')
-const shortid = require('shortid')
+const nanoid = require('nanoid')
 const hfm = require('hexo-front-matter')
 const { EventEmitter } = require('events')
 
@@ -37,8 +37,8 @@ class HexoInstance extends EventEmitter {
 
     this.hexo = new Hexo(this.cwd)
 
-    this.hexo.on('shortid:generate', (postId) => {
-      this.emit('shortid:generate', postId)
+    this.hexo.on('nanoid:generate', (postId) => {
+      this.emit('nanoid:generate', postId)
     })
 
     await this.hexo.init()
@@ -52,7 +52,7 @@ class HexoInstance extends EventEmitter {
     }
 
     if (!name) {
-      name = shortid.generate()
+      name = nanoid()
     }
 
     const template = await fs.readFile(POST_TEMPLATE_FILE, 'utf8')
@@ -71,7 +71,7 @@ class HexoInstance extends EventEmitter {
 
   configure (obj) {
     Object.assign(this.hexo.config, {
-      shortid: obj
+      nanoid: obj
     })
   }
 
@@ -110,7 +110,7 @@ class HexoInstance extends EventEmitter {
   static create () {
     let id
     do {
-      id = shortid.generate()
+      id = nanoid()
     } while (instancePool.has(id))
     return new HexoInstance(id)
   }

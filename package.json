@@ -1,7 +1,7 @@
 {
-  "name": "hexo-shortid",
+  "name": "hexo-nanoid",
   "version": "1.0.0",
-  "description": "Use dylang/shortid to generate abbreviated post links.",
+  "description": "Use ai/nanoid to generate abbreviated post links.",
   "main": "index.js",
   "scripts": {
     "commit": "gitmoji -c",
@@ -9,24 +9,26 @@
   },
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/cowsay-blog/hexo-shortid.git"
+    "url": "git+https://github.com/cowsay-blog/hexo-nanoid.git"
   },
   "keywords": [
     "hexo",
     "post",
     "link",
-    "shortid"
+    "abbr",
+    "abbrlink",
+    "nanoid"
   ],
   "author": "MomoCow",
   "license": "MIT",
   "bugs": {
-    "url": "https://github.com/cowsay-blog/hexo-shortid/issues"
+    "url": "https://github.com/cowsay-blog/hexo-nanoid/issues"
   },
-  "homepage": "https://github.com/cowsay-blog/hexo-shortid#readme",
+  "homepage": "https://github.com/cowsay-blog/hexo-nanoid#readme",
   "dependencies": {
     "hexo-front-matter": "^0.2.3",
     "lodash.get": "^4.4.2",
-    "shortid": "^2.2.14"
+    "nanoid": "^2.0.1"
   },
   "devDependencies": {
     "ava": "^1.1.0",
