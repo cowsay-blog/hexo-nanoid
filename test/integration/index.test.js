@@ -23,7 +23,7 @@ test.beforeEach('Init hexo instance', async function (t) {
   t.context.instance = instance
 })
 
-test('use short id as route', async function (t) {
+test('use nanoid as route', async function (t) {
   t.plan(2)
 
   /**
@@ -46,7 +46,7 @@ test('use short id as route', async function (t) {
   t.true(await streamEqual(postStream, expectStream))
 })
 
-test('short id conflict', async function (t) {
+test('id conflict', async function (t) {
   t.plan(4)
 
   /**
@@ -69,7 +69,7 @@ test('short id conflict', async function (t) {
   }
 })
 
-test('invalid short id', async function (t) {
+test('invalid id', async function (t) {
   t.plan(2)
 
   /**
