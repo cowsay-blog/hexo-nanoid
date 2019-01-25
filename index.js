@@ -1,4 +1,6 @@
 const { promisify } = require('util')
+const shortid = require('shortid')
+
 const writeFileAsync = promisify(require('fs').writeFile)
 
 const validate = require('./lib/validate')
@@ -14,6 +16,18 @@ const {
 
 hexo.extend.filter.register('before_generate', function () {
   const config = getConfig(this)
+
+  if (typeof config.characters === 'string' && config.characters.length === 64) {
+    shortid.characters(config.characters)
+  }
+
+  if (typeof config.seed === 'number') {
+    shortid.seed(config.seed)
+  }
+
+  if (typeof config.worker === 'number') {
+    shortid.worker(config.worker)
+  }
 
   /* Validation */
   const result = validate(this.model('Post').toArray())
