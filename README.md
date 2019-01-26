@@ -13,6 +13,14 @@ Use [ai/nanoid](https://github.com/ai/nanoid) to generate abbreviated post links
 - Ability to autofix invalid and conflicted post IDs.
 - Event `nanoid:generate` is emitted after each ID generation.
 
+## Usage
+Use the variable `:nanoid` in your permalink configuration.
+For example,
+```yaml
+# _config.yml
+permalink: post/:nanoid/
+```
+
 ## Configuration
 The following list shows the descending precedence of config files. (The first one presented is used.)
 - Key `nanoid` in `<hexo_root>/_config.yml`
@@ -59,4 +67,13 @@ interface HexoNanoIdOptions {
    */
   characters?: string
 }
+```
+
+## API
+Event `nanoid:generate` is emitted to the Hexo instance with a parameter `postId`.
+You can listen to it as the following snippet.
+```js
+hexo.on('nanoid:generate', (postId) => {
+    console.log('New post ID is generated: %s.', postId)
+})
 ```
